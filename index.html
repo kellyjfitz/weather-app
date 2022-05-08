@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sunseeker</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <script src="https://kit.fontawesome.com/bdab14af31.js" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;500;600;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<link rel="stylesheet" href="src/styles.css" />
+
+  </head>
+  <body>
+    <div class="container">
+
+      <nav class="navbar navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand"><i class="fa-solid fa-sun"></i> sunseeker <i class="fa-solid fa-sun"></i></a>
+        <form class="d-flex" id="city-search" autocomplete = "off">
+  <div class="input-group mb-3">
+    
+    <input type="search" class="form-control me-2" id="city-input" placeholder="Change city" aria-label="Search for a city to change selection">
+<div class = "input-group-append">
+<button class="btn btn-outline-secondary" id="city-submit" type="submit">
+    
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+
+ <button class="btn btn-outline-secondary" id="current-location" type="button">
+    
+  <i class="fa-solid fa-location-arrow"></i>
+</button>
+</div>
+ 
+
+  </div>
+  </form>
+
+</nav>
+          <h1>Sydney<span class ="country">, AU</span></h1>
+
+
+
+      <h2>Monday, April 18</h2>
+
+    <div class="row align-items-end">
+<div class="col now">    
+    <p id="now">Now
+  <br />
+  <h3 id="now-icon">⛅</h3>
+</p>
+</div>
+<div class="col now-2">    
+
+<h4 id="now-temp">18&deg</h4> 
+<!-- <span class="convert">  <a href="#" id="celsius-now">C</a> | <a href="#" id="fahrenheit-now">F</a></span> -->
+<span class="convert">C</span>
+<p id="now-weather">Partly cloudy</p>
+</div>
+
+<div class="col today">    
+
+<p>Today
+  <br />
+  <h3 id = "today-icon">☀️</h3>
+</p>
+</div>
+
+<div class="col today-2">    
+
+<span class="min-max">Min</span> <h4 id="min-temp">15&deg</h4>
+<br />
+<span class="min-max">Max</span> <h4 id="max-temp">27&deg</h4> 
+
+</div>
+    </div>
+    <section class="forecast">
+<p>
+        ☔ Chance of rain: 2%
+        🌧️  Rain: 0mm
+        <br />
+        💨 Wind: 5km/h
+        
+        ☀️ UV index: 6.3 high
+        
+        💦 Humidity: 93%
+        
+      </p>
+</section>
+      <h2>The next seven days</h2>
+      <div class="row  text-center">
+      <div class="col col-sm-auto">
+
+        <p id="tomorrow">
+          
+
+      </p>
+</div>
+<div class="col col-sm-auto">
+        <p id="plus-2">
+
+      </p>
+</div>
+<div class="col col-sm-auto">
+        <p id="plus-3">
+         
+      </p>
+</div>
+<div class="col col-sm-auto">
+        <p id="plus-4">
+       
+      </p>
+</div>
+<div class="col col-sm-auto">
+        <p id="plus-5">
+        
+      </p>
+</div>
+<div class="col col-sm-auto">
+       <p id="plus-6">
+        
+      </p>
+</div>
+<div class="col col-sm-auto">
+        <p id="plus-7">
+        
+      </p>
+</div>
+      </div>
+    </div>
+    <script src="src/script.js"></script>
+  </body>
+</html>
