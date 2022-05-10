@@ -172,9 +172,12 @@ function getExtraInfo(response) {
   ];
 
   weather.forEach(sevenDayForecast);
-  celsiusTemp = Math.round(response.data.current.weather[0].main);
+  celsiusTemp = Math.round(response.data.current.temp);
+  fahrenheitTemp = convertTemp(celsiusTemp);
   todayMin = Math.round(response.data.daily[0].temp.min);
+  todayMinF = convertTemp(todayMin);
   todayMax = Math.round(response.data.daily[0].temp.max);
+  todayMaxF = convertTemp(todayMax);
   let chanceRain = Math.round(response.data.daily[0].pop * 100);
   let rain = response.data.daily[0].rain;
   if (rain === undefined) {
@@ -189,7 +192,7 @@ function getExtraInfo(response) {
   addForecast(chanceRain, rain, wind, uvIndex, humidity);
 
   //updating the weather and icons for the now and today part
-  updateHtml("#now-temp", `${Math.round(response.data.current.temp)}°`);
+  updateHtml("#now-temp", `${celsiusTemp}°`);
   updateHtml("#min-temp", `${todayMin}°`);
   updateHtml("#max-temp", `${todayMax}°`);
   updateHtml("#now-weather", response.data.current.weather[0].main);
@@ -279,16 +282,26 @@ let months = [
 function convertF(event) {
   event.preventDefault;
   weather.forEach(sevenDayForecastFahrenheit);
+  updateHtml("#now-temp", `${fahrenheitTemp}°`);
+  updateHtml("#min-temp", `${todayMinF}°`);
+  updateHtml("#max-temp", `${todayMaxF}°`);
+}
+function convertC(event) {
+  event.preventDefault;
+  weather.forEach(sevenDayForecast);
+  updateHtml("#now-temp", `${celsiusTemp}°`);
+  updateHtml("#min-temp", `${todayMin}°`);
+  updateHtml("#max-temp", `${todayMax}°`);
 }
 
 //these set the temps so we're able to convert them celsius to fahrenheit
 let celsiusTemp = null;
-let fahrenheitTemp = convertTemp(celsiusTemp);
+let fahrenheitTemp = null;
 let weather = null;
 let todayMin = null;
-let todayMinF = convertTemp(todayMin);
+let todayMinF = null;
 let todayMax = null;
-let todayMaxF = convertTemp(todayMax);
+let todayMaxF = null;
 
 // these variable make it clearer how we are setting the time and date in our functions
 
@@ -304,8 +317,8 @@ let fahrenheitNow = document.querySelector("#fahrenheit-now");
 fahrenheitNow.addEventListener("click", convertF);
 
 // //adding event listener to the now C
-// let celsiusNow = document.querySelector("#celsius-now");
-// celsiusNow.addEventListener("click", convertC);
+let celsiusNow = document.querySelector("#celsius-now");
+celsiusNow.addEventListener("click", convertC);
 
 //calling functions for date and time on page load
 showTime();
