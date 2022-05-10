@@ -88,15 +88,24 @@ function sevenDayForecast(weather) {
         <h3 class="smaller-icon">${weather.icon}</h3>
         <strong>${weather.minTemp}°<span class="separator">/</span>${weather.maxTemp}°</strong>`;
 }
+function sevenDayForecastFahrenheit(weather) {
+  document.querySelector(
+    weather.selector
+  ).innerHTML = `${weather.dayName} <br />
+        <h3 class="smaller-icon">${weather.icon}</h3>
+        <strong>${weather.minTempF}°<span class="separator">/</span>${weather.maxTempF}°</strong>`;
+}
 
 //this gets the info from the second weather api
 function getExtraInfo(response) {
-  let weather = [
+  weather = [
     {
       //tomorrow
       dayName: "Tomorrow",
       minTemp: Math.round(response.data.daily[1].temp.min),
       maxTemp: Math.round(response.data.daily[1].temp.max),
+      minTempF: convertTemp(response.data.daily[1].temp.min),
+      maxTempF: convertTemp(response.data.daily[1].temp.max),
       icon: setIcon(response.data.daily[1].weather[0].main),
       selector: "#tomorrow",
     },
@@ -105,6 +114,8 @@ function getExtraInfo(response) {
       dayName: days[now.getDay() + 2],
       minTemp: Math.round(response.data.daily[2].temp.min),
       maxTemp: Math.round(response.data.daily[2].temp.max),
+      minTempF: convertTemp(response.data.daily[2].temp.min),
+      maxTempF: convertTemp(response.data.daily[2].temp.max),
       icon: setIcon(response.data.daily[2].weather[0].main),
       selector: "#plus-2",
     },
@@ -113,6 +124,8 @@ function getExtraInfo(response) {
       dayName: days[now.getDay() + 3],
       minTemp: Math.round(response.data.daily[3].temp.min),
       maxTemp: Math.round(response.data.daily[3].temp.max),
+      minTempF: convertTemp(response.data.daily[3].temp.min),
+      maxTempF: convertTemp(response.data.daily[3].temp.max),
       icon: setIcon(response.data.daily[3].weather[0].main),
       selector: "#plus-3",
     },
@@ -121,6 +134,8 @@ function getExtraInfo(response) {
       dayName: days[now.getDay() + 4],
       minTemp: Math.round(response.data.daily[4].temp.min),
       maxTemp: Math.round(response.data.daily[4].temp.max),
+      minTempF: convertTemp(response.data.daily[4].temp.min),
+      maxTempF: convertTemp(response.data.daily[4].temp.max),
       icon: setIcon(response.data.daily[4].weather[0].main),
       selector: "#plus-4",
     },
@@ -129,6 +144,8 @@ function getExtraInfo(response) {
       dayName: days[now.getDay() + 5],
       minTemp: Math.round(response.data.daily[5].temp.min),
       maxTemp: Math.round(response.data.daily[5].temp.max),
+      minTempF: convertTemp(response.data.daily[5].temp.min),
+      maxTempF: convertTemp(response.data.daily[5].temp.max),
       icon: setIcon(response.data.daily[5].weather[0].main),
       selector: "#plus-5",
     },
@@ -137,6 +154,8 @@ function getExtraInfo(response) {
       dayName: days[now.getDay() + 6],
       minTemp: Math.round(response.data.daily[6].temp.min),
       maxTemp: Math.round(response.data.daily[6].temp.max),
+      minTempF: convertTemp(response.data.daily[6].temp.min),
+      maxTempF: convertTemp(response.data.daily[6].temp.max),
       icon: setIcon(response.data.daily[6].weather[0].main),
       selector: "#plus-6",
     },
@@ -145,13 +164,17 @@ function getExtraInfo(response) {
       dayName: days[now.getDay() + 7],
       minTemp: Math.round(response.data.daily[7].temp.min),
       maxTemp: Math.round(response.data.daily[7].temp.max),
+      minTempF: convertTemp(response.data.daily[7].temp.min),
+      maxTempF: convertTemp(response.data.daily[7].temp.max),
       icon: setIcon(response.data.daily[7].weather[0].main),
       selector: "#plus-7",
     },
   ];
 
   weather.forEach(sevenDayForecast);
-
+  celsiusTemp = Math.round(response.data.current.weather[0].main);
+  todayMin = Math.round(response.data.daily[0].temp.min);
+  todayMax = Math.round(response.data.daily[0].temp.max);
   let chanceRain = Math.round(response.data.daily[0].pop * 100);
   let rain = response.data.daily[0].rain;
   if (rain === undefined) {
@@ -167,8 +190,8 @@ function getExtraInfo(response) {
 
   //updating the weather and icons for the now and today part
   updateHtml("#now-temp", `${Math.round(response.data.current.temp)}°`);
-  updateHtml("#min-temp", `${Math.round(response.data.daily[0].temp.min)}°`);
-  updateHtml("#max-temp", `${Math.round(response.data.daily[0].temp.max)}°`);
+  updateHtml("#min-temp", `${todayMin}°`);
+  updateHtml("#max-temp", `${todayMax}°`);
   updateHtml("#now-weather", response.data.current.weather[0].main);
   updateHtml("#now-icon", setIcon(response.data.current.weather[0].main));
   updateHtml("#today-icon", setIcon(response.data.daily[0].weather[0].main));
@@ -216,6 +239,11 @@ function addForecast(chanceRain, rain, wind, uvIndex, humidity) {
     💨 Wind: ${wind}km/h ☀️ UV index: ${uvIndex} 💦 Humidity: ${humidity}%
   </p>`;
 }
+// converting to fahrenheit
+function convertTemp(temp) {
+  temp = Math.round(temp * 1.8 + 32);
+  return temp;
+}
 
 //this sets the days and months so we can convert them from numbers to words
 let days = [
@@ -248,14 +276,36 @@ let months = [
   "November",
   "December",
 ];
+function convertF(event) {
+  event.preventDefault;
+  weather.forEach(sevenDayForecastFahrenheit);
+}
+
+//these set the temps so we're able to convert them celsius to fahrenheit
+let celsiusTemp = null;
+let fahrenheitTemp = convertTemp(celsiusTemp);
+let weather = null;
+let todayMin = null;
+let todayMinF = convertTemp(todayMin);
+let todayMax = null;
+let todayMaxF = convertTemp(todayMax);
 
 // these variable make it clearer how we are setting the time and date in our functions
+
 let now = new Date();
 let currentDay = days[now.getDay()];
 let currentDate = now.getDate();
 let currentMonth = months[now.getMonth()];
 let currentHour = now.getHours();
 let currentMinute = now.getMinutes();
+
+// adding event listener to the now F
+let fahrenheitNow = document.querySelector("#fahrenheit-now");
+fahrenheitNow.addEventListener("click", convertF);
+
+// //adding event listener to the now C
+// let celsiusNow = document.querySelector("#celsius-now");
+// celsiusNow.addEventListener("click", convertC);
 
 //calling functions for date and time on page load
 showTime();
