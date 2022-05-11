@@ -108,3 +108,10 @@ footer {
   position: relative;
   top: -12px;
 }
+.convert .display {
+  color: black;
+  text-decoration: none;
+}
+.convert .display:hover {
+  cursor: default;
+}

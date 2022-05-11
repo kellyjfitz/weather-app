@@ -281,6 +281,8 @@ let months = [
 ];
 function convertF(event) {
   event.preventDefault;
+  celsiusNow.classList.remove("display");
+  fahrenheitNow.classList.add("display");
   weather.forEach(sevenDayForecastFahrenheit);
   updateHtml("#now-temp", `${fahrenheitTemp}°`);
   updateHtml("#min-temp", `${todayMinF}°`);
@@ -288,6 +290,8 @@ function convertF(event) {
 }
 function convertC(event) {
   event.preventDefault;
+  celsiusNow.classList.add("display");
+  fahrenheitNow.classList.remove("display");
   weather.forEach(sevenDayForecast);
   updateHtml("#now-temp", `${celsiusTemp}°`);
   updateHtml("#min-temp", `${todayMin}°`);
