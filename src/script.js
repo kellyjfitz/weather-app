@@ -329,3 +329,10 @@ showTime();
 showDate();
 //setting the weather for Sydney Australia on load
 getWeatherData("-33.8688", 151.2093);
+if (currentHour >= 20 || currentHour < 5) {
+  document.querySelector("body").style.background =
+    "linear-gradient(114.9deg, rgb(34, 34, 34) 8.3%, rgb(0, 40, 60) 41.6%, rgb(0, 143, 213) 93.4%)";
+  document.querySelector("body").style.color = "white";
+  document.querySelector(".convert .display").style.color = "white";
+  document.querySelector("footer a").style.color = "white";
+}
