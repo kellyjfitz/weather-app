@@ -187,7 +187,9 @@ function getExtraInfo(response) {
   let uvIndex = response.data.daily[0].uvi;
   // default metric units for wind speed are metres per second, need to convert to km/h by multiplying by 3.6
   let wind = Math.round(response.data.daily[0].wind_speed * 3.6);
-
+  let timezone = response.data.timezone;
+  destinationTime = getDestinationTime(timezone);
+  checkTime();
   //updating the bit above the sevenday forecast
   addForecast(chanceRain, rain, wind, uvIndex, humidity);
 
@@ -297,7 +299,13 @@ function convertC(event) {
   updateHtml("#min-temp", `${todayMin}°`);
   updateHtml("#max-temp", `${todayMax}°`);
 }
-
+function checkTime() {
+  if (localTime != destinationTime) {
+    console.log("test");
+    //need to put code here to replace Now: and time with Time at destination, or similar wording
+    // and then insert destination time
+  }
+}
 //these set the temps so we're able to convert them celsius to fahrenheit
 let celsiusTemp = null;
 let fahrenheitTemp = null;
@@ -315,6 +323,19 @@ let currentDate = now.getDate();
 let currentMonth = months[now.getMonth()];
 let currentHour = now.getHours();
 let currentMinute = now.getMinutes();
+let localTime = new Intl.DateTimeFormat("en-GB", {
+  timeStyle: "short",
+  hc: "h24",
+}).format(now);
+let destinationTime = null;
+function getDestinationTime(timezone) {
+  destinationTime = new Intl.DateTimeFormat("en-GB", {
+    timeStyle: "short",
+    timeZone: timezone,
+    hc: "h24",
+  }).format(now);
+  return destinationTime;
+}
 
 // adding event listener to the now F
 let fahrenheitNow = document.querySelector("#fahrenheit-now");
