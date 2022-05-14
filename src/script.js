@@ -4,20 +4,12 @@ function updateHtml(selector, textToAdd) {
   document.querySelector(selector).innerHTML = textToAdd;
 }
 
-//this sets the current time underneath the date
 function showTime() {
-  let nowTime = document.querySelector("#now");
-  if (currentMinute < 10) {
-    currentMinute = `0${currentMinute}`;
-  }
-  nowTime.innerHTML = `Now: ${currentHour}:${currentMinute}`;
+  document.querySelector("#time").innerHTML = destinationTime;
 }
 
-//this sets the current day, month, date under the city
 function showDate() {
-  document.querySelector(
-    "h2"
-  ).innerHTML = `${currentDay}, ${currentMonth} ${currentDate}`;
+  document.querySelector("#date").innerHTML = destinationDate;
 }
 
 // adding event listener to the form submit
@@ -187,9 +179,15 @@ function getExtraInfo(response) {
   let uvIndex = response.data.daily[0].uvi;
   // default metric units for wind speed are metres per second, need to convert to km/h by multiplying by 3.6
   let wind = Math.round(response.data.daily[0].wind_speed * 3.6);
-  let timezone = response.data.timezone;
-  destinationTime = getDestinationTime(timezone);
-  checkTime();
+  let timeZone = response.data.timezone;
+  destinationTime = getDestinationTime(timeZone);
+  destinationDate = getDestinationDate(timeZone);
+  let sunrise = sunTimes(response.data.daily[0].sunrise);
+  let sunset = sunTimes(response.data.daily[0].sunset);
+
+  showTime();
+  showDate();
+
   //updating the bit above the sevenday forecast
   addForecast(chanceRain, rain, wind, uvIndex, humidity);
 
@@ -328,6 +326,7 @@ let localTime = new Intl.DateTimeFormat("en-GB", {
   hc: "h24",
 }).format(now);
 let destinationTime = null;
+let destinationDate = null;
 function getDestinationTime(timezone) {
   destinationTime = new Intl.DateTimeFormat("en-GB", {
     timeStyle: "short",
@@ -335,6 +334,20 @@ function getDestinationTime(timezone) {
     hc: "h24",
   }).format(now);
   return destinationTime;
+}
+function getDestinationDate(timezone) {
+  destinationDate = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "full",
+    timeZone: timezone,
+  }).format(now);
+  return destinationDate;
+}
+function sunTimes(time) {
+  let sunTime = new Intl.DateTimeFormat("en-GB", {
+    timeStyle: "short",
+    hc: "h24",
+  }).format(time * 1000);
+  return sunTime;
 }
 
 // adding event listener to the now F
@@ -346,8 +359,8 @@ let celsiusNow = document.querySelector("#celsius-now");
 celsiusNow.addEventListener("click", convertC);
 
 //calling functions for date and time on page load
-showTime();
-showDate();
+// showTime();
+//showDate();
 //setting the weather for Sydney Australia on load
 getWeatherData("-33.8688", 151.2093);
 if (currentHour >= 20 || currentHour < 5) {
