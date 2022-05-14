@@ -184,7 +184,7 @@ function getExtraInfo(response) {
   destinationDate = getDestinationDate(timeZone);
   let sunrise = sunTimes(response.data.daily[0].sunrise, timeZone);
   let sunset = sunTimes(response.data.daily[0].sunset, timeZone);
-  setTheme(destinationTime, sunset);
+  setTheme(destinationTime, sunset, sunrise);
   showTime();
   showDate();
 
@@ -245,8 +245,8 @@ function addForecast(
     💨 Wind: ${wind}km/h ☀️ UV index: ${uvIndex} 💦 Humidity: ${humidity}%
   </p>`;
 }
-function setTheme(destinationTime, sunset) {
-  if (destinationTime > sunset) {
+function setTheme(destinationTime, sunset, sunrise) {
+  if (destinationTime > sunset || destinationTime < sunrise) {
     document.querySelector("body").classList.add("night-theme-body");
     document.querySelector("footer a").classList.add("night-theme-text");
   } else {
