@@ -20,6 +20,9 @@ h2 {
   font-size: 24px;
   margin: 20px 0 0;
 }
+small {
+  font-size: 16px;
+}
 
 h3 {
   font-size: 60px;
@@ -107,9 +110,23 @@ footer {
   top: -12px;
 }
 .convert .display {
-  color: black;
   text-decoration: none;
+  color: inherit;
 }
 .convert .display:hover {
   cursor: default;
+  color: inherit;
+}
+
+.night-theme-body {
+  background: linear-gradient(
+    114.9deg,
+    rgb(34, 34, 34) 8.3%,
+    rgb(0, 40, 60) 41.6%,
+    rgb(0, 143, 213) 93.4%
+  );
+  color: white;
+}
+.night-theme-text {
+  color: white;
 }

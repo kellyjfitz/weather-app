@@ -72,7 +72,7 @@ function getWeatherData(latitude, longitude) {
     .then(getExtraInfo);
 }
 
-// this functions is used on the weather array to set the sevenday forecast
+// these functions is used on the weather array to set the sevenday forecast
 function sevenDayForecast(weather) {
   document.querySelector(
     weather.selector
@@ -182,14 +182,14 @@ function getExtraInfo(response) {
   let timeZone = response.data.timezone;
   destinationTime = getDestinationTime(timeZone);
   destinationDate = getDestinationDate(timeZone);
-  let sunrise = sunTimes(response.data.daily[0].sunrise);
-  let sunset = sunTimes(response.data.daily[0].sunset);
-
+  let sunrise = sunTimes(response.data.daily[0].sunrise, timeZone);
+  let sunset = sunTimes(response.data.daily[0].sunset, timeZone);
+  setTheme(destinationTime, sunset);
   showTime();
   showDate();
 
   //updating the bit above the sevenday forecast
-  addForecast(chanceRain, rain, wind, uvIndex, humidity);
+  addForecast(sunrise, sunset, chanceRain, rain, wind, uvIndex, humidity);
 
   //updating the weather and icons for the now and today part
   updateHtml("#now-temp", `${celsiusTemp}°`);
@@ -204,20 +204,15 @@ function setIcon(weather) {
   let icon = "☀️";
   if (weather === "Clear") {
     icon = "☀️";
-  }
-  if (weather === "Rain" || weather === "Drizzle") {
+  } else if (weather === "Rain" || weather === "Drizzle") {
     icon = "🌧️";
-  }
-  if (weather === "Clouds") {
+  } else if (weather === "Clouds") {
     icon = "☁️";
-  }
-  if (weather === "Snow") {
+  } else if (weather === "Snow") {
     icon = "❄️";
-  }
-  if (weather === "Thunderstorm") {
+  } else if (weather === "Thunderstorm") {
     icon = "🌩️";
-  }
-  if (
+  } else if (
     weather === "Mist" ||
     weather === "Fog" ||
     weather === "Smoke" ||
@@ -227,20 +222,37 @@ function setIcon(weather) {
     weather === "Ash"
   ) {
     icon = "🌫️";
-  }
-  if (weather === "Squall" || weather === "Tornado") {
+  } else if (weather === "Squall" || weather === "Tornado") {
     icon = "🌪️";
   }
   return icon;
 }
 
-function addForecast(chanceRain, rain, wind, uvIndex, humidity) {
+function addForecast(
+  sunrise,
+  sunset,
+  chanceRain,
+  rain,
+  wind,
+  uvIndex,
+  humidity
+) {
   let forecast = document.querySelector(".forecast");
   forecast.innerHTML = `<p>
-    ☔ Chance of rain: ${chanceRain}% 🌧️ Rain: ${rain}mm
+  🌞 Sunrise: ${sunrise} 🌚 Sunset: ${sunset}  
+  <br />☔ Chance of rain: ${chanceRain}% 🌧️ Rain: ${rain}mm
     <br />
     💨 Wind: ${wind}km/h ☀️ UV index: ${uvIndex} 💦 Humidity: ${humidity}%
   </p>`;
+}
+function setTheme(destinationTime, sunset) {
+  if (destinationTime > sunset) {
+    document.querySelector("body").classList.add("night-theme-body");
+    document.querySelector("footer a").classList.add("night-theme-text");
+  } else {
+    document.querySelector("body").classList.remove("night-theme-body");
+    document.querySelector("footer a").classList.remove("night-theme-text");
+  }
 }
 // converting to fahrenheit
 function convertTemp(temp) {
@@ -297,13 +309,7 @@ function convertC(event) {
   updateHtml("#min-temp", `${todayMin}°`);
   updateHtml("#max-temp", `${todayMax}°`);
 }
-function checkTime() {
-  if (localTime != destinationTime) {
-    console.log("test");
-    //need to put code here to replace Now: and time with Time at destination, or similar wording
-    // and then insert destination time
-  }
-}
+
 //these set the temps so we're able to convert them celsius to fahrenheit
 let celsiusTemp = null;
 let fahrenheitTemp = null;
@@ -321,10 +327,7 @@ let currentDate = now.getDate();
 let currentMonth = months[now.getMonth()];
 let currentHour = now.getHours();
 let currentMinute = now.getMinutes();
-let localTime = new Intl.DateTimeFormat("en-GB", {
-  timeStyle: "short",
-  hc: "h24",
-}).format(now);
+
 let destinationTime = null;
 let destinationDate = null;
 function getDestinationTime(timezone) {
@@ -342,9 +345,10 @@ function getDestinationDate(timezone) {
   }).format(now);
   return destinationDate;
 }
-function sunTimes(time) {
+function sunTimes(time, timezone) {
   let sunTime = new Intl.DateTimeFormat("en-GB", {
     timeStyle: "short",
+    timeZone: timezone,
     hc: "h24",
   }).format(time * 1000);
   return sunTime;
@@ -359,14 +363,6 @@ let celsiusNow = document.querySelector("#celsius-now");
 celsiusNow.addEventListener("click", convertC);
 
 //calling functions for date and time on page load
-// showTime();
-//showDate();
+
 //setting the weather for Sydney Australia on load
 getWeatherData("-33.8688", 151.2093);
-if (currentHour >= 20 || currentHour < 5) {
-  document.querySelector("body").style.background =
-    "linear-gradient(114.9deg, rgb(34, 34, 34) 8.3%, rgb(0, 40, 60) 41.6%, rgb(0, 143, 213) 93.4%)";
-  document.querySelector("body").style.color = "white";
-  document.querySelector(".convert .display").style.color = "white";
-  document.querySelector("footer a").style.color = "white";
-}
