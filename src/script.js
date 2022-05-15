@@ -72,98 +72,54 @@ function getWeatherData(latitude, longitude) {
     .then(getExtraInfo);
 }
 
-// these functions is used on the weather array to set the sevenday forecast
-function sevenDayForecast(weather) {
-  document.querySelector(
-    weather.selector
-  ).innerHTML = `${weather.dayName} <br />
-        <h3 class="smaller-icon">${weather.icon}</h3>
-        <strong>${weather.minTemp}°<span class="separator">/</span>${weather.maxTemp}°</strong>`;
+// these functions are used on the weather array to set the sevenday forecast
+function sevenDayForecast() {
+  let forecast = document.querySelector("#seven-day-forecast");
+  let forecastHtml = `<div class="row  text-center">`;
+
+  weather.forEach(function (day, index) {
+    if (index > 0) {
+      forecastHtml =
+        forecastHtml +
+        `<div class="col col-sm-auto"><p>
+   ${getDayNames(timeZone, day.dt)} <br />
+        <h3 class="smaller-icon">${setIcon(day.weather[0].main)}</h3>
+        <strong>${Math.round(
+          day.temp.min
+        )}°<span class="separator">/</span>${Math.round(day.temp.max)}°</strong>
+    </p></div>`;
+    }
+  });
+  forecastHtml = forecastHtml + `</div>`;
+  forecast.innerHTML = forecastHtml;
 }
-function sevenDayForecastFahrenheit(weather) {
-  document.querySelector(
-    weather.selector
-  ).innerHTML = `${weather.dayName} <br />
-        <h3 class="smaller-icon">${weather.icon}</h3>
-        <strong>${weather.minTempF}°<span class="separator">/</span>${weather.maxTempF}°</strong>`;
+
+function sevenDayForecastFahrenheit() {
+  let forecast = document.querySelector("#seven-day-forecast");
+  let forecastHtml = `<div class="row  text-center">`;
+
+  weather.forEach(function (day, index) {
+    if (index > 0) {
+      forecastHtml =
+        forecastHtml +
+        `<div class="col col-sm-auto"><p>
+   ${getDayNames(timeZone, day.dt)} <br />
+        <h3 class="smaller-icon">${setIcon(day.weather[0].main)}</h3>
+        <strong>${convertTemp(
+          day.temp.min
+        )}°<span class="separator">/</span>${convertTemp(
+          day.temp.max
+        )}°</strong>
+    </p></div>`;
+    }
+  });
+  forecastHtml = forecastHtml + `</div>`;
+  forecast.innerHTML = forecastHtml;
 }
 
 //this gets the info from the second weather api
 function getExtraInfo(response) {
-  weather = [
-    {
-      //tomorrow
-      dayName: "Tomorrow",
-      minTemp: Math.round(response.data.daily[1].temp.min),
-      maxTemp: Math.round(response.data.daily[1].temp.max),
-      minTempF: convertTemp(response.data.daily[1].temp.min),
-      maxTempF: convertTemp(response.data.daily[1].temp.max),
-      icon: setIcon(response.data.daily[1].weather[0].main),
-      selector: "#tomorrow",
-    },
-    {
-      //plus 2 days
-      dayName: days[now.getDay() + 2],
-      minTemp: Math.round(response.data.daily[2].temp.min),
-      maxTemp: Math.round(response.data.daily[2].temp.max),
-      minTempF: convertTemp(response.data.daily[2].temp.min),
-      maxTempF: convertTemp(response.data.daily[2].temp.max),
-      icon: setIcon(response.data.daily[2].weather[0].main),
-      selector: "#plus-2",
-    },
-    {
-      //plus 3 days
-      dayName: days[now.getDay() + 3],
-      minTemp: Math.round(response.data.daily[3].temp.min),
-      maxTemp: Math.round(response.data.daily[3].temp.max),
-      minTempF: convertTemp(response.data.daily[3].temp.min),
-      maxTempF: convertTemp(response.data.daily[3].temp.max),
-      icon: setIcon(response.data.daily[3].weather[0].main),
-      selector: "#plus-3",
-    },
-    {
-      //plus 4 days
-      dayName: days[now.getDay() + 4],
-      minTemp: Math.round(response.data.daily[4].temp.min),
-      maxTemp: Math.round(response.data.daily[4].temp.max),
-      minTempF: convertTemp(response.data.daily[4].temp.min),
-      maxTempF: convertTemp(response.data.daily[4].temp.max),
-      icon: setIcon(response.data.daily[4].weather[0].main),
-      selector: "#plus-4",
-    },
-    {
-      //plus 5 days
-      dayName: days[now.getDay() + 5],
-      minTemp: Math.round(response.data.daily[5].temp.min),
-      maxTemp: Math.round(response.data.daily[5].temp.max),
-      minTempF: convertTemp(response.data.daily[5].temp.min),
-      maxTempF: convertTemp(response.data.daily[5].temp.max),
-      icon: setIcon(response.data.daily[5].weather[0].main),
-      selector: "#plus-5",
-    },
-    {
-      //plus 6 days
-      dayName: days[now.getDay() + 6],
-      minTemp: Math.round(response.data.daily[6].temp.min),
-      maxTemp: Math.round(response.data.daily[6].temp.max),
-      minTempF: convertTemp(response.data.daily[6].temp.min),
-      maxTempF: convertTemp(response.data.daily[6].temp.max),
-      icon: setIcon(response.data.daily[6].weather[0].main),
-      selector: "#plus-6",
-    },
-    {
-      //plus 7 days
-      dayName: days[now.getDay() + 7],
-      minTemp: Math.round(response.data.daily[7].temp.min),
-      maxTemp: Math.round(response.data.daily[7].temp.max),
-      minTempF: convertTemp(response.data.daily[7].temp.min),
-      maxTempF: convertTemp(response.data.daily[7].temp.max),
-      icon: setIcon(response.data.daily[7].weather[0].main),
-      selector: "#plus-7",
-    },
-  ];
-
-  weather.forEach(sevenDayForecast);
+  weather = response.data.daily;
 
   celsiusTemp = Math.round(response.data.current.temp);
   fahrenheitTemp = convertTemp(celsiusTemp);
@@ -180,12 +136,13 @@ function getExtraInfo(response) {
   let uvIndex = response.data.daily[0].uvi;
   // default metric units for wind speed are metres per second, need to convert to km/h by multiplying by 3.6
   let wind = Math.round(response.data.daily[0].wind_speed * 3.6);
-  let timeZone = response.data.timezone;
+  timeZone = response.data.timezone;
   destinationTime = getDestinationTime(timeZone);
   destinationDate = getDestinationDate(timeZone);
   let sunrise = sunTimes(response.data.daily[0].sunrise, timeZone);
   let sunset = sunTimes(response.data.daily[0].sunset, timeZone);
   setTheme(destinationTime, sunset, sunrise);
+  sevenDayForecast();
   showTime();
   showDate();
 
@@ -261,37 +218,6 @@ function convertTemp(temp) {
   return temp;
 }
 
-//this sets the days and months so we can convert them from numbers to words
-let days = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
-let months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 function convertF(event) {
   event.preventDefault;
   celsiusNow.classList.remove("display");
@@ -319,16 +245,11 @@ let todayMin = null;
 let todayMinF = null;
 let todayMax = null;
 let todayMaxF = null;
+let timeZone = null;
 
 // these variable make it clearer how we are setting the time and date in our functions
 
 let now = new Date();
-let currentDay = days[now.getDay()];
-let currentDate = now.getDate();
-let currentMonth = months[now.getMonth()];
-let currentHour = now.getHours();
-let currentMinute = now.getMinutes();
-
 let destinationTime = null;
 let destinationDate = null;
 function getDestinationTime(timezone) {
@@ -373,8 +294,6 @@ fahrenheitNow.addEventListener("click", convertF);
 // //adding event listener to the now C
 let celsiusNow = document.querySelector("#celsius-now");
 celsiusNow.addEventListener("click", convertC);
-
-//calling functions for date and time on page load
 
 //setting the weather for Sydney Australia on load
 getWeatherData("-33.8688", 151.2093);
