@@ -164,6 +164,7 @@ function getExtraInfo(response) {
   ];
 
   weather.forEach(sevenDayForecast);
+
   celsiusTemp = Math.round(response.data.current.temp);
   fahrenheitTemp = convertTemp(celsiusTemp);
   todayMin = Math.round(response.data.daily[0].temp.min);
@@ -339,8 +340,11 @@ function getDestinationTime(timezone) {
   return destinationTime;
 }
 function getDestinationDate(timezone) {
-  destinationDate = new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "full",
+  //this one is US format so it will display as month, date
+  destinationDate = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
     timeZone: timezone,
   }).format(now);
   return destinationDate;
@@ -354,6 +358,14 @@ function sunTimes(time, timezone) {
   return sunTime;
 }
 
+function getDayNames(timezone, date) {
+  let day = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    timeZone: timezone,
+    hc: "h24",
+  }).format(date * 1000);
+  return day;
+}
 // adding event listener to the now F
 let fahrenheitNow = document.querySelector("#fahrenheit-now");
 fahrenheitNow.addEventListener("click", convertF);
