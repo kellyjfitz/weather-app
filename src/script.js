@@ -73,6 +73,48 @@ function getWeatherData(latitude, longitude) {
     .then(getExtraInfo);
 }
 
+//this gets the info from the second weather api
+function getExtraInfo(response) {
+  celsiusNow.classList.add("display");
+  fahrenheitNow.classList.remove("display");
+  weather = response.data.daily;
+  celsiusTemp = Math.round(response.data.current.temp);
+  fahrenheitTemp = convertTemp(celsiusTemp);
+  todayMin = Math.round(response.data.daily[0].temp.min);
+  todayMinF = convertTemp(todayMin);
+  todayMax = Math.round(response.data.daily[0].temp.max);
+  todayMaxF = convertTemp(todayMax);
+  let chanceRain = Math.round(response.data.daily[0].pop * 100);
+  let rain = response.data.daily[0].rain;
+  if (rain === undefined) {
+    rain = 0;
+  }
+  let humidity = response.data.daily[0].humidity;
+  let uvIndex = response.data.daily[0].uvi;
+  // default metric units for wind speed are metres per second, need to convert to km/h by multiplying by 3.6
+  let wind = Math.round(response.data.daily[0].wind_speed * 3.6);
+  timeZone = response.data.timezone;
+  destinationTime = getDestinationTime(timeZone);
+  destinationDate = getDestinationDate(timeZone);
+  let sunrise = sunTimes(response.data.daily[0].sunrise, timeZone);
+  let sunset = sunTimes(response.data.daily[0].sunset, timeZone);
+  setTheme(destinationTime, sunset, sunrise);
+  sevenDayForecast();
+  showTime();
+  showDate();
+
+  //updating the bit above the sevenday forecast
+  addForecast(sunrise, sunset, chanceRain, rain, wind, uvIndex, humidity);
+
+  //updating the weather and icons for the now and today part
+  updateHtml("#now-temp", `${celsiusTemp}°`);
+  updateHtml("#min-temp", `${todayMin}°`);
+  updateHtml("#max-temp", `${todayMax}°`);
+  updateHtml("#now-weather", response.data.current.weather[0].main);
+  updateHtml("#now-icon", setIcon(response.data.current.weather[0].main));
+  updateHtml("#today-icon", setIcon(response.data.daily[0].weather[0].main));
+}
+
 // these functions are used on the weather array to set the sevenday forecast
 function sevenDayForecast() {
   let forecast = document.querySelector("#seven-day-forecast");
@@ -116,48 +158,6 @@ function sevenDayForecastFahrenheit() {
   });
   forecastHtml = forecastHtml + `</div>`;
   forecast.innerHTML = forecastHtml;
-}
-
-//this gets the info from the second weather api
-function getExtraInfo(response) {
-  celsiusNow.classList.add("display");
-  fahrenheitNow.classList.remove("display");
-  weather = response.data.daily;
-  celsiusTemp = Math.round(response.data.current.temp);
-  fahrenheitTemp = convertTemp(celsiusTemp);
-  todayMin = Math.round(response.data.daily[0].temp.min);
-  todayMinF = convertTemp(todayMin);
-  todayMax = Math.round(response.data.daily[0].temp.max);
-  todayMaxF = convertTemp(todayMax);
-  let chanceRain = Math.round(response.data.daily[0].pop * 100);
-  let rain = response.data.daily[0].rain;
-  if (rain === undefined) {
-    rain = 0;
-  }
-  let humidity = response.data.daily[0].humidity;
-  let uvIndex = response.data.daily[0].uvi;
-  // default metric units for wind speed are metres per second, need to convert to km/h by multiplying by 3.6
-  let wind = Math.round(response.data.daily[0].wind_speed * 3.6);
-  timeZone = response.data.timezone;
-  destinationTime = getDestinationTime(timeZone);
-  destinationDate = getDestinationDate(timeZone);
-  let sunrise = sunTimes(response.data.daily[0].sunrise, timeZone);
-  let sunset = sunTimes(response.data.daily[0].sunset, timeZone);
-  setTheme(destinationTime, sunset, sunrise);
-  sevenDayForecast();
-  showTime();
-  showDate();
-
-  //updating the bit above the sevenday forecast
-  addForecast(sunrise, sunset, chanceRain, rain, wind, uvIndex, humidity);
-
-  //updating the weather and icons for the now and today part
-  updateHtml("#now-temp", `${celsiusTemp}°`);
-  updateHtml("#min-temp", `${todayMin}°`);
-  updateHtml("#max-temp", `${todayMax}°`);
-  updateHtml("#now-weather", response.data.current.weather[0].main);
-  updateHtml("#now-icon", setIcon(response.data.current.weather[0].main));
-  updateHtml("#today-icon", setIcon(response.data.daily[0].weather[0].main));
 }
 
 function setIcon(weather) {
@@ -205,21 +205,14 @@ function addForecast(
     💨 Wind: ${wind}km/h ☀️ UV index: ${uvIndex} 💦 Humidity: ${humidity}%
   </p>`;
 }
-function setTheme(destinationTime, sunset, sunrise) {
-  if (destinationTime > sunset || destinationTime < sunrise) {
-    document.querySelector("body").classList.add("night-theme-body");
-    document.querySelector("footer a").classList.add("night-theme-text");
-  } else {
-    document.querySelector("body").classList.remove("night-theme-body");
-    document.querySelector("footer a").classList.remove("night-theme-text");
-  }
-}
-// converting to fahrenheit
+
+// formula to convert to fahrenheit
 function convertTemp(temp) {
   temp = Math.round(temp * 1.8 + 32);
   return temp;
 }
 
+//this function converts the temps to F when the user presses the F button
 function convertF(event) {
   event.preventDefault;
   celsiusNow.classList.remove("display");
@@ -229,6 +222,8 @@ function convertF(event) {
   updateHtml("#min-temp", `${todayMinF}°`);
   updateHtml("#max-temp", `${todayMaxF}°`);
 }
+
+//this function converts the temps back to C when the user presses the C button
 function convertC(event) {
   event.preventDefault;
   celsiusNow.classList.add("display");
@@ -237,6 +232,18 @@ function convertC(event) {
   updateHtml("#now-temp", `${celsiusTemp}°`);
   updateHtml("#min-temp", `${todayMin}°`);
   updateHtml("#max-temp", `${todayMax}°`);
+}
+
+//this function changes the background colour and text colour
+// if it is night time in the city that's been searched for
+function setTheme(destinationTime, sunset, sunrise) {
+  if (destinationTime > sunset || destinationTime < sunrise) {
+    document.querySelector("body").classList.add("night-theme-body");
+    document.querySelector("footer a").classList.add("night-theme-text");
+  } else {
+    document.querySelector("body").classList.remove("night-theme-body");
+    document.querySelector("footer a").classList.remove("night-theme-text");
+  }
 }
 
 //these set the temps so we're able to convert them celsius to fahrenheit
@@ -254,6 +261,8 @@ let timeZone = null;
 let now = new Date();
 let destinationTime = null;
 let destinationDate = null;
+
+//this sets the local time for the city that has been searched for
 function getDestinationTime(timezone) {
   destinationTime = new Intl.DateTimeFormat("en-GB", {
     timeStyle: "short",
@@ -263,7 +272,7 @@ function getDestinationTime(timezone) {
   return destinationTime;
 }
 function getDestinationDate(timezone) {
-  //this one is US format so it will display as month, date
+  //this one is US format so it will display the date in the h2 as month, date
   destinationDate = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -272,6 +281,8 @@ function getDestinationDate(timezone) {
   }).format(now);
   return destinationDate;
 }
+//this is used for the sunrise and sunset times, to convert them to a real time,
+//then also the time at destination
 function sunTimes(time, timezone) {
   let sunTime = new Intl.DateTimeFormat("en-GB", {
     timeStyle: "short",
@@ -280,7 +291,7 @@ function sunTimes(time, timezone) {
   }).format(time * 1000);
   return sunTime;
 }
-
+//this is getting the day names for the sevenday forecast
 function getDayNames(timezone, date) {
   let day = new Intl.DateTimeFormat("en-GB", {
     weekday: "long",
