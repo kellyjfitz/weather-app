@@ -26,6 +26,7 @@ function getCity(event) {
   let city = cityInput.value;
   let apiUrl = "https://api.openweathermap.org/geo/1.0/direct?q=";
   axios.get(`${apiUrl}${city}&appid=${apiKey}`).then(getCityDetails);
+  cityInput.value = "";
 }
 
 //this gets the coordinates of the current location when the user presses the button
@@ -119,8 +120,9 @@ function sevenDayForecastFahrenheit() {
 
 //this gets the info from the second weather api
 function getExtraInfo(response) {
+  celsiusNow.classList.add("display");
+  fahrenheitNow.classList.remove("display");
   weather = response.data.daily;
-
   celsiusTemp = Math.round(response.data.current.temp);
   fahrenheitTemp = convertTemp(celsiusTemp);
   todayMin = Math.round(response.data.daily[0].temp.min);
@@ -247,7 +249,7 @@ let todayMax = null;
 let todayMaxF = null;
 let timeZone = null;
 
-// these variable make it clearer how we are setting the time and date in our functions
+// these variables help get the local times for sunrise, sunset and local time/date
 
 let now = new Date();
 let destinationTime = null;
